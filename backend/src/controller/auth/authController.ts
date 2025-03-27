@@ -53,7 +53,7 @@ export const signInUser: RequestHandler = async (req, res) => {
         const jwtToken = await generateJwtToken(user);
 
         // 4. Return response
-        return sendResponse(res, 200, true, "Logged in successfully", { user, token: jwtToken });
+        return sendResponse(res, 200, true, "Logged in successfully", {user: {token: jwtToken}});
 
     } catch (error) {
         console.error(`Error in signing in user: ${error}`);
