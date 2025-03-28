@@ -9,7 +9,7 @@ export default {
             },
             backgroundColor: {
                 bgOne: "#f0f0f0",
-                bgTwo: "#e0e0e0",
+                bgTwo: "#E0E0E0FF",
                 bgThree: "#b3b3b3",
                 bgFour: "#333333",
                 bgFive: "#000000",
