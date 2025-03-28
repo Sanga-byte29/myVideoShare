@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
  
 import { toast } from "sonner";
 import Sidebar from "../../components/Sidebar";
-import { selectLoggedInUser } from "../../reducers/auth/authReducer";
+import { AuthResponse, selectLoggedInUser, updateUser } from "../../reducers/auth/authReducer";
+import backendApi from "../../api/backendApi";
+import { useConfig } from "../../customHooks/useConfigHook";
  
 
 const UserProfile: React.FC = () => {
@@ -11,8 +13,8 @@ const UserProfile: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [edit, setEdit] = useState<boolean>(false);
-//   const dispatch = useDispatch();
-//   const { configWithJWT } = useConfig();
+  const dispatch = useDispatch();
+  const { configWithJWT } = useConfig();
   useEffect(() => {
     if (loggedInUser?.name) {
       setName(loggedInUser.name);
@@ -24,9 +26,25 @@ const UserProfile: React.FC = () => {
   const handleEditClick = () => {
     setEdit((prev) => !prev);
   };
+//   const token = localStorage.getItem("token");
 
   const handleSaveClick = async () => {
-     
+    try {
+      const { data } = await backendApi.post<AuthResponse>(
+        "/api/v1/user/update",
+        { name, email },
+        configWithJWT
+      );
+      if (data.success) {
+        toast.success(data.message);
+        dispatch(updateUser({ email, name }));
+        setEdit(false);
+      } else {
+        toast.warning(data.message);
+      }
+    } catch (error) {
+      toast.error("Internal server errror");
+    }
   };
 
   return (
