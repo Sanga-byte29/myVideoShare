@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { sendResponse } from "../../config/utils/sendRepsonse";
 import { compareHashedPassword, hashPassword } from "../../config/utils/passwordHelper";
 import { generateJwtToken } from "../../config/utils/generateJwtToken";
+import { resetPasswordEmail } from "../../mailer/resetPassword";
 
 interface RegisterReq extends Request{
     body: {
@@ -61,3 +62,42 @@ export const signInUser: RequestHandler = async (req, res) => {
     }
 };
 
+export const sendEmailForResetPassword: RequestHandler = async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return sendResponse(res, 404, false, "email not found");
+      }
+      const user = await User?.findOne({ email });
+      if (!user) {
+        return sendResponse(res, 404, false, "User not found");
+      }
+      await resetPasswordEmail(user);
+      sendResponse(res, 200, true, "Check your mail to reset your password");
+    } catch (error) {
+      console.error(`ERrror in authentication ${error}`);
+      return sendResponse(res, 500, false, "Internal server errro");
+    }
+  };
+
+  export const updatePassword: RequestHandler = async (req, res) => {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+      if (!token) {
+        return sendResponse(res, 404, false, "Token not found");
+      }
+      const user = await User.findOne({ token });
+      if (!user) {
+        return sendResponse(res, 404, false, "User not found");
+      }
+      const hashedPassword = await hashPassword(password);
+      user.password = hashedPassword;
+      user.token = crypto.randomBytes(16).toString("hex");
+      await user.save();
+      return sendResponse(res, 200, true, "Updated your password");
+    } catch (error) {
+      console.error(`ERrror in authentication ${error}`);
+      return sendResponse(res, 500, false, "Internal server errro");
+    }
+  };
