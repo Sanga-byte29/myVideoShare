@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Layout from '../../components/Layout'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { AuthFormData } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../reducers/store';
@@ -65,6 +65,14 @@ const SignIn : React.FC = () => {
                         onChange={handleData}
                         />
                     </div>
+                    <div className="flex justify-between items-center">
+              <NavLink
+                to="/reset-password"
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                Forgot your password?
+              </NavLink>
+            </div>
                     <button 
                     disabled={loading}
                     type="submit"
